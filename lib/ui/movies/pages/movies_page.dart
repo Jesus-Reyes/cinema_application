@@ -1,6 +1,7 @@
 import 'package:cinema_application/adapters/providers/movies/movies_provider.dart';
 import 'package:cinema_application/ui/movies/widgets/appbar_widget.dart';
 import 'package:cinema_application/ui/movies/widgets/categories_widget.dart';
+import 'package:cinema_application/ui/movies/widgets/featured_movies_widget.dart';
 import 'package:cinema_application/ui/movies/widgets/search_movies_widget.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -17,20 +18,24 @@ class MoviesPage extends ConsumerWidget {
         body: moviesState.when(
           loading: () => const Center(child: CircularProgressIndicator()),
           error: (error, stack) => Center(child: Text('Error: $error')),
-          data: (user) => Padding(
+          data: (moviesData) => Padding(
             padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 10),
             child: CustomScrollView(slivers: [
               AppbarWidget(),
-              SliverList(
-                delegate: SliverChildBuilderDelegate(
-                  childCount: 2,
-                  (context, index) {
-                    if (index == 0) {
-                      return const SearchMoviesWidget();
-                    } else {
-                      return const CategoriesWidget();
-                    }
-                  },
+              SliverToBoxAdapter(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    const SearchMoviesWidget(),
+                    const CategoriesWidget(),
+                    FeaturedMoviesWidget(
+                      movies: moviesData.playingMovies,
+                      title: 'Feature Movies',
+                      onSeeAllPressed: () {
+                        // Navigate to see all featured movies
+                      },
+                    ),
+                  ],
                 ),
               ),
             ]),
